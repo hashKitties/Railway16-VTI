@@ -9,7 +9,7 @@ CREATE TABLE department (
 CREATE TABLE `position` (
     PRIMARY KEY (position_id),
     position_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
-    position_name VARCHAR(50)
+    position_name ENUM ('Dev','Test','Scrum Master','PM')
 );
 
 CREATE TABLE `account` (
