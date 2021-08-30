@@ -1,10 +1,10 @@
-DROP DATABASE IF EXISTS assignment1;
-CREATE DATABASE IF NOT EXISTS assignment1;
-USE assignment1;
+DROP DATABASE IF EXISTS assignment2;
+CREATE DATABASE IF NOT EXISTS assignment2;
+USE assignment2;
 CREATE TABLE department (
     PRIMARY KEY (department_id),
     department_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
-    department_name NVARCHAR(50)
+    department_name VARCHAR(50)
 );
 CREATE TABLE `position` (
     PRIMARY KEY (position_id),

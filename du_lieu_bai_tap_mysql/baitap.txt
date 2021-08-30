@@ -1,0 +1,440 @@
+-- create table
+
+CREATE table department (
+primary key (department_id),
+department_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+department_name NVARCHAR(50),
+
+);
+create table `position` (
+primary key (position_id),
+position_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+position_name VARCHAR(50)
+);
+
+create table `account` (
+primary key (acount_id)
+acount_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+email VARCHAR(50),
+username VARCHAR(50),
+fullname NVARCHAR(50),
+department_id SMALLINT UNSIGNED NOT NULL,
+position_id SMALLINT UNSIGNED NOT NULL,
+create_date DATE,
+FOREIGN KEY () REFERENCES ...(),
+FOREIGN KEY () REFERENCES ...()
+);
+
+create table `group` (
+primary key (group_id),
+group_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+group_name NVARCHAR(50),
+creator_id SMALLINT UNSIGNED NOT NULL,
+create_date DATE,
+FOREIGN KEY () REFERENCES ...()
+);
+
+create table group_account (
+primary key (group_id, account_id),
+group_id SMALLINT UNSIGNED NOT NULL,
+account_id SMALLINT UNSIGNED NOT NULL,
+join_date DATE
+);
+
+create table type_question (
+primary key (type_id),
+type_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+type_name VARCHAR(50)
+);
+
+create table category_question (
+primary key (category_id)
+category_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+category_name VARCHAR(50)
+);
+
+create table question (
+primary key (question_id)
+question_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+content TEXT,
+category_id SMALLINT UNSIGNED NOT NULL,
+type_id SMALLINT UNSIGNED NOT NULL,
+creator_id SMALLINT UNSIGNED NOT NULL,
+create_date DATE,
+FOREIGN KEY () REFERENCES ...(),
+FOREIGN KEY () REFERENCES ...(),
+FOREIGN KEY () REFERENCES ...()
+);
+
+create table answer (
+primary key (answer_id)
+answer_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+content TEXT,
+question_id SMALLINT UNSIGNED NOT NULL,
+is_correct ENUM('TRUE','FALSE'),
+FOREIGN KEY () REFERENCES ...()
+);
+
+create table exam (
+primary key (exam_id)
+exam_id SMALLINT UNSIGNED AUTO_INCREMENT NOT NULL,
+code NVARCHAR(50)
+title NVARCHAR(50)
+category_id SMALLINT UNSIGNED NOT NULL,
+duration SMALLINT UNSIGNED NOT NULL,
+creator_id SMALLINT UNSIGNED NOT NULL,
+create_date DATE,
+FOREIGN KEY () REFERENCES ...(),
+FOREIGN KEY () REFERENCES ...()
+);
+
+create table exam_question (
+primary key (exam_id, question_id)
+exam_id SMALLINT UNSIGNED NOT NULL,
+question_id SMALLINT UNSIGNED NOT NULL,
+FOREIGN KEY () REFERENCES ...(),
+FOREIGN KEY () REFERENCES ...()
+);
+
+
+--Insert data - Assignment 2 & 3
+
+insert into department(department_name) 
+values (N'Sale',
+N'Marketing',
+N'Nhân sự',
+N'Thị trường',
+N'Kinh doanh',
+N'Hành chính',
+N'Bảo vệ',
+N'Kỹ thuật',
+N'Tổng hợp',
+N'Tài chính',
+N'Kế toán',
+N'Kế hoạch',
+N'Nghiên cứu',
+N'Phát triển',
+N'Dịch vụ'
+);
+
+insert into `position`(position_name)
+values (N'Dev',
+N'Test',
+N'Scrum Master',
+N'PM'
+);
+
+insert into `account`(email,username,fullname,department_id,position_id,create_date)
+values (
+'test01@gmail.com',	'test01',	N'Đào Tiến Hà',		1,	2,	2009-01-10,
+'test02@gmail.com',	'test02',	N'Phạm Thị Lý',		1,	1,	2010-02-11,
+'test03@gmail.com',	'test03',	N'Ngô Thị Thu',		2,	4,	2011-03-12,
+'test04@gmail.com',	'test04',	N'Nguyễn Văn Công',	4,	3,	2012-04-13,
+'test05@gmail.com',	'test05',	N'Trần Tuấn Anh',	5,	1,	2013-05-14,
+'test06@gmail.com',	'test06',	N'Hoàng Kim Phương',	4,	2,	2014-06-15,
+'test07@gmail.com',	'test07',	N'Nguyễn Thị Diễn',	3,	4,	2015-07-16,
+'test08@gmail.com',	'test08',	N'Nguyễn Văn Biên',	1,	3,	2016-08-17,
+'test09@gmail.com',	'test09',	N'Lương Minh công',	6,	2,	2017-09-18,
+'test10@gmail.com',	'test10',	N'Tạ Đức Tâm',		1,	1,	2018-10-19,
+'test11@gmail.com',	'test11',	N'Nguyễn Văn Hùng',	2,	4,	2019-11-20,
+'test12@gmail.com',	'test12',	N'Đỗ Việt Dũng',	7,	2,	2020-12-21,
+'test13@gmail.com',	'test13',	N'Chu Thị An',		8,	1,	2021-04-22,
+'test14@gmail.com',	'test14',	N'Nguyễn Thị Xuân',	5,	3,	2022-07-23,
+'test15@gmail.com',	'test15',	N'Phạm Thị Hải',	1,	4,	2023-07-24
+);
+
+insert into `group`(group_name,creator_id,create_date)
+values (
+N'Nhóm 1',	1,	2009-01-10,
+N'Nhóm 2',	2,	2010-02-11,
+N'Nhóm 3',	1,	2011-03-12,
+N'Nhóm 4',	4,	2012-04-13,
+N'Nhóm 5',	8,	2013-05-14,
+N'Nhóm 6',	5,	2014-06-15,
+N'Nhóm 7',	4,	2015-07-16,
+N'Nhóm 8',	6,	2016-08-17,
+N'Nhóm 9',	2,	2017-09-18,
+N'Nhóm 10',	9,	2018-10-19,
+N'Nhóm 11',	7,	2019-11-20,
+N'Nhóm 12',	5,	2020-12-21,
+N'Nhóm 13',	5,	2021-04-22,
+N'Nhóm 14',	1,	2022-07-23,
+N'Nhóm 15',	3,	2023-07-24
+);
+
+insert into group_account (group_id,join_date
+values (
+1,	2009-01-10,
+2,	2010-02-11,
+1,	2011-03-12,
+4,	2012-04-13,
+5,	2013-05-14,
+4,	2014-06-15,
+8,	2015-07-16,
+4,	2016-08-17,
+6,	2017-09-18,
+10,	2018-10-19,
+1,	2019-11-20,
+2,	2020-12-21,
+1,	2021-04-22,
+11,	2022-07-23,
+15,	2023-07-24
+);
+
+insert into type_question(type_name)
+values ('Essay',
+'Multiple-Choices'
+);
+
+insert into category_question(category_name)
+values ('Java',
+'NET',
+'SQL',
+'Postman',
+'Ruby',
+'Git',
+'Python',
+'JavaScript',
+'Angular',
+'NoteJS',
+'HTML',
+'CSS',
+'Vue',
+'PHP',
+'Chung'
+);
+
+insert into question (content,category_id,type_id,creator_id,create_date)
+values (
+N'Tháng 1 có bao nhiêu ngày?',	1,	1,	1,	2009-01-10,
+N'Tháng 2 có bao nhiêu ngày?',	2,	2,	2,	2010-02-11,
+N'Tháng 3 có bao nhiêu ngày?',	3,	1,	3,	2011-03-12,
+N'Tháng 4 có bao nhiêu ngày?',	4,	1,	4,	2012-04-13,
+N'Tháng 5 có bao nhiêu ngày?',	5,	2,	5,	2013-05-14,
+N'Tháng 6 có bao nhiêu ngày?',	1,	1,	6,	2014-06-15,
+N'Tháng 7 có bao nhiêu ngày?',	2,	2,	7,	2015-07-16,
+N'Tháng 8 có bao nhiêu ngày?',	3,	1,	8,	2016-08-17,
+N'Tháng 9 có bao nhiêu ngày?',	4,	1,	9,	2017-09-18,
+N'Tháng 10 có bao nhiêu ngày?',	5,	2,	5,	2018-10-19,
+N'Tháng 11 có bao nhiêu ngày?',	3,	2,	6,	2019-11-20,
+N'Tháng 12 có bao nhiêu ngày?',	4,	1,	7,	2020-12-21,
+N'Một ngày có bao nhiêu giờ?',	5,	1,	8,	2021-04-22,
+N'Một giờ có bao nhiêu phút?',	6,	2,	14,	2022-07-23,
+N'Một phút có bao nhiêu giây?',	7,	1,	15,	2023-07-24
+);
+
+insert into aswer (content, question_id, is_correct)
+values (
+N'31',		1,	'TRUE',
+N'30',		2,	'FALSE',
+N'31',		3,	'TRUE',
+N'Câu hỏi',	10,	'FALSE',
+N'31',		11,	'TRUE',
+N'Câu hỏi',	12,	'TRUE',
+N'28',		13,	'FALSE',
+N'31',		8,	'TRUE',
+N'Câu hỏi',	9,	'TRUE',
+N'31',		10,	'TRUE',
+N'29',		11,	'FALSE',
+N'28',		12,	'FALSE',
+N'24',		13,	'TRUE',
+N'24',		14,	'FALSE',
+N'60',		15,	'TRUE'
+
+);
+
+insert into exam (code,title,category_id,duration,creator_id,create_date)
+values (
+N'T01_01',	N'Bài thi 01',	1,	60,	1,	2009-01-10,
+N'T01_02',	N'Bài thi 02',	2,	60,	2,	2010-02-11,
+N'T01_03',	N'Bài thi 03',	3,	90,	1,	2011-03-12,
+N'T01_04',	N'Bài thi 04',	4,	15,	4,	2012-04-13,
+N'T01_05',	N'Bài thi 05',	5,	20,	8,	2013-05-14,
+N'T01_06',	N'Bài thi 06',	1,	30,	5,	2014-06-15,
+N'T01_07',	N'Bài thi 07',	2,	60,	4,	2015-07-16,
+N'T02_01',	N'Bài thi 08',	3,	20,	6,	2016-08-17,
+N'T02_02',	N'Bài thi 09',	4,	15,	2,	2017-09-18,
+N'T02_03',	N'Bài thi 10',	5,	90,	9,	2018-10-19,
+N'T02_04',	N'Bài thi 11',	3,	120,	7,	2019-11-20,
+N'T02_05',	N'Bài thi 12',	4,	120,	5,	2020-12-21,
+N'T02_06',	N'Bài thi 13',	5,	60,	5,	2021-04-22,
+N'T02_07',	N'Bài thi 14',	6,	10,	1,	2022-07-23,
+N'T02_08',	N'Bài thi 15',	7,	15,	3,	2023-07-24
+
+);
+
+insert into exam_question
+values (
+1,	15,
+2,	14,
+3,	13,
+4,	12,
+5,	11,
+6,	10,
+7,	9,
+8,	8,
+9,	7,
+10,	6,
+11,	5,
+12,	4,
+13,	3,
+14,	2,
+15,	1
+);
+
+-- assignment 3
+
+-- Question 2: lấy ra tất cả các phòng ban
+select department_name
+from department;
+
+-- Question 3: lấy ra id của phòng ban "Sale"
+select department_id
+from department
+where department_name IN ('Sale');
+
+-- Question 4:lấy ra thông tin account có full name dài nhất
+select LEN(account_name), account_name
+from account
+order by LEN(account_name) DESC
+LIMIT 1;
+
+-- Question 5: Lấy ra thông tin account có full name dài nhất và thuộc phòng ban có id
+= 3
+select LEN(account_name), account_name
+from account
+WHERE department_id = 3
+order by LEN(account_name) DESC
+LIMIT 1;
+
+-- Question 6: Lấy ra tên group đã tham gia trước ngày 20/12/2019
+select group_name
+from group
+where create_date < 2019-12-20;
+
+-- Question 7: Lấy ra ID của question có >= 4 câu trả lời
+select count(answer_id), question_id
+from question
+having count(answer_id) >= 4;
+
+-- Question 8: Lấy ra các mã đề thi có thời gian thi >= 60 phút và được tạo trước ngày
+20/12/2019
+select exam_id, duration, create_date
+from exam
+where duration >= 60 && create_date <= 2019--12-20;
+
+-- Question 9: Lấy ra 5 group được tạo gần đây nhất
+select group_name, create_date
+from group
+order by create_date DESC
+LIMIT 5;
+
+-- Question 10: Đếm số nhân viên thuộc department có id = 2
+select count(account_id)
+from account
+where department_id = 2;
+
+-- Question 11: Lấy ra nhân viên có tên bắt đầu bằng chữ "D" và kết thúc bằng chữ "o"
+select fullname
+from account
+where fullname LIKE ('D%o');
+
+-- Question 12: Xóa tất cả các exam được tạo trước ngày 20/12/2019
+DELETE FROM exam
+WHERE create_date < 2019-12-20
+
+-- Question 13: Xóa tất cả các question có nội dung bắt đầu bằng từ "câu hỏi"
+DELETE FROM question
+WHERE content LIKE ('Câu hỏi%')
+
+
+-- Question 14: Update thông tin của account có id = 5 thành tên "Nguyễn Bá Lộc" và
+email thành loc.nguyenba@vti.com.vn
+UPDATE account
+set fullname = 'Nguyễn Bá Lộc', email = 'loc.nguyenba@vti.com.vn'
+on account_id = 5;
+
+-- Question 15: update account có id = 5 sẽ thuộc group có id = 4
+update group_account
+set group_id = 4
+on account_id = 5;
+
+-- Assignment 4:
+--Question 1: Viết lệnh để lấy ra danh sách nhân viên và thông tin phòng ban của họ
+select account.fullname, account.department_id, department.department_id
+from account
+left join department
+on account.department_id = department.department_id;
+--Question 2: Viết lệnh để lấy ra thông tin các account được tạo sau ngày 20/12/2010
+select *
+from account
+where create_date > 2010-12-20;
+
+--Question 3: Viết lệnh để lấy ra tất cả các developer
+select *
+from account
+where position_id = 1;
+
+--Question 4: Viết lệnh để lấy ra danh sách các phòng ban có >3 nhân viên
+select account.department_id, department.department_name
+from 
+	(select department_id, count(department_id)
+	from account
+	group by department_id
+	having count(department_id) > 3)
+join department
+on account.department_id = department.department_name;
+
+--Question 5: Viết lệnh để lấy ra danh sách câu hỏi được sử dụng trong đề thi nhiều
+nhất
+select count(question_id), question_id
+from exam_question
+order by count(question_id) DESC
+Limit 1;
+
+--Question 6: Thông kê mỗi category Question được sử dụng trong bao nhiêu Question
+select category_id, count(question_id)
+from question
+group by category_id;
+
+--Question 7: Thông kê mỗi Question được sử dụng trong bao nhiêu Exam
+select question_id, count(exam_id)
+from exam_question
+group by question_id;
+
+--Question 8: Lấy ra Question có nhiều câu trả lời nhất
+select question_id, count(answer_id)
+from answer
+group by question_id;
+
+--Question 9: Thống kê số lượng account trong mỗi group
+
+--Question 10: Tìm chức vụ có ít người nhất
+
+--Question 11: Thống kê mỗi phòng ban có bao nhiêu dev, test, scrum master, PM
+
+--Question 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của
+
+--question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì, …
+
+--Question 13: Lấy ra số lượng câu hỏi của mỗi loại tự luận hay trắc nghiệm
+
+--Question 14:Lấy ra group không có account nào Question 15: Lấy ra group không có account nào
+
+--Question 16: Lấy ra question không có answer nào
+
+--Question 17:
+
+--a) Lấy các account thuộc nhóm thứ 1
+
+--b) Lấy các account thuộc nhóm thứ 2
+
+--c) Ghép 2 kết quả từ câu a) và câu b) sao cho không có record nào trùng nhau
+
+--Question 18:
+
+--a) Lấy các group có lớn hơn 5 thành viên
+
+--b) Lấy các group có nhỏ hơn 7 thành viên
+
+--c) Ghép 2 kết quả từ câu a) và câu b)
