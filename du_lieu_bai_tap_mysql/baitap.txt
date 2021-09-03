@@ -408,33 +408,80 @@ from answer
 group by question_id;
 
 --Question 9: Thống kê số lượng account trong mỗi group
+select count(group_id), group_id
+from group_account
+group by group_id;
 
 --Question 10: Tìm chức vụ có ít người nhất
+select count(position_id), position_id
+from account
+order by count(position_id)
+LIMIT 1;
 
 --Question 11: Thống kê mỗi phòng ban có bao nhiêu dev, test, scrum master, PM
+select count(position_id), position_id, department_id
+group_by department_id, position_id;
 
---Question 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của
-
---question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì, …
+--Question 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì, …
+select question.question_id, question.content, question.category_id, question.type_id, question.creator_id, question.create_date, answer.content, answer.question_id
+From question
+left join answer
+ON question.question_id = answer.question_id;
 
 --Question 13: Lấy ra số lượng câu hỏi của mỗi loại tự luận hay trắc nghiệm
+select question.type_id, question.count(type_id), type_question.type_id, type_question.type_name
+from question
+group by type_id
+join type_question
+on question.type_id = type_question.type_id
 
---Question 14:Lấy ra group không có account nào Question 15: Lấy ra group không có account nào
+--Question 14:Lấy ra group không có account nào 
+select *
+from group_account
+where account_id IS NULL;
+
+--Question 15: Lấy ra group không có account nào
+select *
+from group_account
+where account_id IS NULL;
 
 --Question 16: Lấy ra question không có answer nào
+select question.question_id, answer.question_id, answer.is_correct
+from question
+left join answer
+on question.question_id = answer.question_id
+where is_correct IS NULL;
 
 --Question 17:
 
 --a) Lấy các account thuộc nhóm thứ 1
-
+select distinct
+from (
+select *
+from group_account
+where group_id = 1;
+ 
 --b) Lấy các account thuộc nhóm thứ 2
-
+select *
+from group_account
+where group_id = 2
+);
 --c) Ghép 2 kết quả từ câu a) và câu b) sao cho không có record nào trùng nhau
+
 
 --Question 18:
 
 --a) Lấy các group có lớn hơn 5 thành viên
-
+select count(account_id), group_id
+from group_account
+group by group_id
+having count(account_id)>5
+UNION
 --b) Lấy các group có nhỏ hơn 7 thành viên
+select count(account_id), group_id
+from group_account
+group by group_id
+having count(account_id)<7;
+
 
 --c) Ghép 2 kết quả từ câu a) và câu b)
