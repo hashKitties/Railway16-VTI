@@ -158,27 +158,61 @@ DELIMITER ;
 CALL p_delete_exam_id(1);
 
 -- Question 10: Tìm ra các exam được tạo từ 3 năm trước và xóa các exam đó đi (sử dụng store ở câu 9 để xóa) (unsolved)
-SELECT 
-    ExamID
-FROM
-    exam
-WHERE
-    YEAR(NOW()) - YEAR(CreateDate) >= 3;
+DROP PROCEDURE IF EXISTS p_delete_exam_id_over_3_year;
+DELIMITER //
+CREATE PROCEDURE p_delete_exam_id_over_3_year()
+BEGIN
+	DECLARE v_target_exam_id SMALLINT;
+    delete_loop: LOOP
+		SELECT 
+			ExamID
+		INTO v_target_exam_id
+		FROM
+			exam
+		WHERE
+			YEAR(NOW()) - YEAR(CreateDate) >= 2
+		LIMIT 1;
+        IF v_target_exam_id IS NULL
+			THEN LEAVE delete_loop;
+		ELSE 
+			CALL p_delete_exam_id(v_target_exam_id);
+        END IF;
+    END LOOP delete_loop;
+END//
+DELIMITER ;
+
+CALL p_delete_exam_id_over_3_year();
 
 -- Sau đó in số lượng record đã remove từ các table liên quan trong khi removing (unsolved)
 
 
 -- Question 11: Viết store cho phép người dùng xóa phòng ban bằng cách người dùng nhập vào tên phòng ban và các account thuộc phòng ban đó sẽ được
 -- chuyển về phòng ban default là phòng ban chờ việc
-DROP PROCEDURE IF EXISTS p_delete_exam_id;
+DROP PROCEDURE IF EXISTS p_remove_department;
 DELIMITER //
-CREATE PROCEDURE p_delete_exam_id(IN v_department_name NVARCHAR(50), v_account SMALLINT)
+CREATE PROCEDURE p_remove_department(IN v_department_name NVARCHAR(50))
 BEGIN 
-	
+	DECLARE v_department_id SMALLINT;
+    SELECT 
+		DepartmentID
+    INTO v_department_id 
+    FROM
+		department
+	WHERE 
+		DepartmentName = v_department_name;
+    UPDATE 
+    	`account`
+    SET 
+		DepartmentID = 11
+    WHERE 
+    	`account`.DepartmentID = v_department_id;
+    DELETE FROM 
+		department
+    WHERE DepartmentID = v_department_id;
 END//
 DELIMITER ;
 
-CALL p_delete_exam_id(1);
+CALL p_remove_department('Marketing');
 
 -- Question 12: Viết store để in ra mỗi tháng có bao nhiêu câu hỏi được tạo trong năm nay
 DROP PROCEDURE IF EXISTS p_count_question_created_in_month;
