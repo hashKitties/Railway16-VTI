@@ -1,0 +1,217 @@
+USE testingsystem;
+-- Question 1: Tạo store để người dùng nhập vào tên phòng ban và in ra tất cả các account thuộc phòng ban đó
+DROP PROCEDURE IF EXISTS p_show_account;
+DELIMITER //
+CREATE PROCEDURE p_show_account(IN department_name NVARCHAR(50))
+BEGIN 
+	SELECT 
+		Username, FullName
+	FROM
+		`account`
+	WHERE
+		DepartmentID IN (SELECT 
+							DepartmentID
+						FROM
+							department
+						WHERE
+							DepartmentName = department_name);
+END//
+DELIMITER ;
+CALL p_show_account('Bán hàng');
+
+-- Question 2: Tạo store để in ra số lượng account trong mỗi group
+DROP PROCEDURE IF EXISTS p_show_account_in_group;
+DELIMITER //
+CREATE PROCEDURE p_show_account_in_group()
+BEGIN 
+	SELECT COUNT(AccountID) AS NumberOFAccount, GroupID
+    FROM groupaccount
+    GROUP BY GroupID;
+END//
+DELIMITER ;
+CALL p_show_account_in_group();
+
+-- Question 3: Tạo store để thống kê mỗi type question có bao nhiêu question được tạo trong tháng hiện tại
+DROP PROCEDURE IF EXISTS p_type_question_create_in_current_month;
+DELIMITER //
+CREATE PROCEDURE p_type_question_create_in_current_month()
+BEGIN 
+	SELECT 
+		typequestion.TypeName,
+		COUNT(question.QuestionID) AS NumberOfQuestion,
+		question.CreateDate
+	FROM
+		question
+        JOIN
+		typequestion ON typequestion.TypeID = question.TypeID
+	GROUP BY typequestion.TypeName
+	HAVING MONTH(CreateDate) = MONTH(NOW());
+END//
+DELIMITER ;
+CALL p_type_question_create_in_current_month();
+
+-- Question 4: Tạo store để trả ra id của type question có nhiều câu hỏi nhất
+DROP PROCEDURE IF EXISTS p_most_asked_type_question_id;
+DELIMITER //
+CREATE PROCEDURE p_most_asked_type_question_id()
+BEGIN 
+	SELECT 
+		TypeID
+	FROM
+		question
+	GROUP BY TypeID
+	ORDER BY COUNT(QuestionID) DESC
+    LIMIT 1;
+END//
+DELIMITER ;
+CALL p_most_asked_type_question_id();
+
+-- Function (not sovled)
+DROP FUNCTION IF EXISTS f_most_asked_type_question_id;
+DELIMITER //
+CREATE FUNCTION f_most_asked_type_question_id() RETURNS SMALLINT
+BEGIN 
+	DECLARE v_type_id SMALLINT;
+	SELECT 
+		TypeID
+	INTO v_type_id 
+    FROM
+		question
+	GROUP BY TypeID
+	ORDER BY COUNT(QuestionID) DESC;
+	RETURN v_type_id;
+END//
+DELIMITER ;
+
+-- Question 5: Sử dụng store ở question 4 để tìm ra tên của type question (not solved)
+
+
+-- Question 6: Viết 1 store cho phép người dùng nhập vào 1 chuỗi và trả về group có tên chứa chuỗi của người dùng nhập vào hoặc trả về user có username chứa chuỗi của người dùng nhập vào
+DROP PROCEDURE IF EXISTS p_show_input_group_or_username;
+DELIMITER //
+CREATE PROCEDURE p_show_input_group_or_username(IN v_input NVARCHAR(50))
+BEGIN 
+	SELECT 
+		GroupName AS Result
+	FROM 
+		`group`
+	WHERE `group`.GroupName LIKE (CONCAT('%',v_input,'%'))
+	UNION ALL
+    SELECT 
+		Username
+     FROM 
+		`account`
+	WHERE Username LIKE (CONCAT('%',v_input,'%'));
+END//
+DELIMITER ;
+CALL p_show_input_group_or_username('vti');
+
+-- Question 7: Viết 1 store cho phép người dùng nhập vào thông tin fullName, email và trong store sẽ tự động gán: username sẽ giống email nhưng bỏ phần @..mail đi
+-- positionID: sẽ có default là developer
+-- departmentID: sẽ được cho vào 1 phòng chờ
+
+DROP PROCEDURE IF EXISTS p_create_user;
+INSERT INTO department (DepartmentName)
+VALUES ('Waiting Room');
+
+DELIMITER //
+CREATE PROCEDURE p_create_user(IN v_input_fullname NVARCHAR(50), v_input_email NVARCHAR(50))
+BEGIN 
+	INSERT INTO `account`(Email, Username, FullName, DepartmentID, PositionID, CreateDate)
+    VALUES (v_input_email, LEFT(v_input_email, LOCATE('@',v_input_email) - 1), v_input_fullname, 11, 1, NOW());
+END//
+DELIMITER ;
+
+CALL p_create_user('Nguyen Phat','phat@gmail.com');
+
+-- Question 8: Viết 1 store cho phép người dùng nhập vào Essay hoặc Multiple-Choice để thống kê câu hỏi essay hoặc multiple-choice nào có content dài nhất
+DROP PROCEDURE IF EXISTS p_find_max_question_content;
+
+DELIMITER //
+CREATE PROCEDURE p_find_max_question_content(IN v_type_question NVARCHAR(50))
+BEGIN 
+	SELECT 
+		question.Content AS LongestContent
+	FROM
+		question
+	JOIN
+		typequestion ON typequestion.TypeID = question.TypeID
+	WHERE typequestion.TypeName = v_type_question
+	ORDER BY LENGTH(question.Content) DESC
+	LIMIT 1;
+END//
+DELIMITER ;
+
+CALL p_find_max_question_content('Essay');
+
+-- Question 9: Viết 1 store cho phép người dùng xóa exam dựa vào ID (unsolved delete: Error code 1451)
+-- PROCEDURE
+DROP PROCEDURE IF EXISTS p_delete_exam_id;
+DELIMITER //
+CREATE PROCEDURE p_delete_exam_id(IN v_exam_id SMALLINT)
+BEGIN 
+	DELETE FROM exam
+    WHERE ExamID = v_exam_id;
+END//
+DELIMITER ;
+
+CALL p_delete_exam_id(1);
+
+-- Question 10: Tìm ra các exam được tạo từ 3 năm trước và xóa các exam đó đi (sử dụng store ở câu 9 để xóa) (unsolved)
+SELECT 
+    ExamID
+FROM
+    exam
+WHERE
+    YEAR(NOW()) - YEAR(CreateDate) >= 3;
+
+-- Sau đó in số lượng record đã remove từ các table liên quan trong khi removing (unsolved)
+
+
+-- Question 11: Viết store cho phép người dùng xóa phòng ban bằng cách người dùng nhập vào tên phòng ban và các account thuộc phòng ban đó sẽ được
+-- chuyển về phòng ban default là phòng ban chờ việc
+DROP PROCEDURE IF EXISTS p_delete_exam_id;
+DELIMITER //
+CREATE PROCEDURE p_delete_exam_id(IN v_department_name NVARCHAR(50), v_account SMALLINT)
+BEGIN 
+	
+END//
+DELIMITER ;
+
+CALL p_delete_exam_id(1);
+
+-- Question 12: Viết store để in ra mỗi tháng có bao nhiêu câu hỏi được tạo trong năm nay
+DROP PROCEDURE IF EXISTS p_count_question_created_in_month;
+DELIMITER //
+CREATE PROCEDURE p_count_question_created_in_month()
+BEGIN 
+	SELECT 
+		COUNT(QuestionID)
+	FROM
+		question
+	WHERE
+		MONTH(CreateDate) = MONTH(NOW())
+	GROUP BY MONTH(CreateDate);
+END//
+DELIMITER ;
+
+CALL p_count_question_created_in_month();
+
+-- Question 13: Viết store để in ra mỗi tháng có bao nhiêu câu hỏi được tạo trong 6 tháng gần đây nhất
+DROP PROCEDURE IF EXISTS p_count_question_created_in_6_month_range;
+DELIMITER //
+CREATE PROCEDURE p_count_question_created_in_6_month_range()
+BEGIN 
+	SELECT 
+		COUNT(QuestionID)
+	FROM
+		question
+	WHERE
+		DATEDIFF(NOW(),CreateDate) <= 180
+	GROUP BY MONTH(CreateDate);
+END//
+DELIMITER ;
+
+CALL p_count_question_created_in_6_month_range();
+
+-- (Nếu tháng nào không có thì sẽ in ra là "không có câu hỏi nào trong tháng")
