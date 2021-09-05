@@ -34,20 +34,20 @@ FROM
         JOIN
     department ON `account`.DepartmentID = department.DepartmentID
 GROUP BY DepartmentID
-HAVING NumberOfAccount >= 2;
+HAVING NumberOfAccount >= 3;
 
 -- Question 5: Viết lệnh để lấy ra danh sách câu hỏi được sử dụng trong đề thi nhiều nhất
 SELECT 
-    COUNT(ExamID) AS NumberOfUsed, QuestionID
+    COUNT(QuestionID) AS NumberOfUsed, QuestionID
 FROM
     examquestion
 GROUP BY QuestionID
 HAVING
-    COUNT(ExamID) = (
+    COUNT(QuestionID) = (
 		SELECT MAX(MyCount)
 		FROM
 			(SELECT 
-				COUNT(ExamID) MyCount, QuestionID
+				COUNT(QuestionID) MyCount
 			FROM
 				examquestion
 			GROUP BY QuestionID) AS maxcount);
