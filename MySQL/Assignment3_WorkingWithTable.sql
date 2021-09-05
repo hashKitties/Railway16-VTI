@@ -1,5 +1,6 @@
 -- assignment 3
 USE testingsystem;
+SET autocommit = 0;
 -- Question 2: lấy ra tất cả các phòng ban
 SELECT 
     DepartmentName
@@ -87,10 +88,13 @@ WHERE
     CreateDate < '2019-12-20';
 
 -- Question 13: Xóa tất cả các question có nội dung bắt đầu bằng từ "câu hỏi"
+SET foreign_key_checks = 0;
+
 DELETE FROM question 
 WHERE
     Content LIKE ('Câu hỏi%');
 
+SET foreign_key_check = 1;
 
 -- Question 14: Update thông tin của account có id = 5 thành tên "Nguyễn Bá Lộc" và email thành loc.nguyenba@vti.com.vn
 UPDATE `account` 

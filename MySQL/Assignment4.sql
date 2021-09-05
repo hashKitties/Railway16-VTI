@@ -42,16 +42,23 @@ SELECT
 FROM
     examquestion
 GROUP BY QuestionID
-ORDER BY NumberOfUsed DESC
-LIMIT 1;
+HAVING
+    COUNT(ExamID) = (
+		SELECT MAX(MyCount)
+		FROM
+			(SELECT 
+				COUNT(ExamID) MyCount, QuestionID
+			FROM
+				examquestion
+			GROUP BY QuestionID) AS maxcount);
 
 -- Question 6: Thông kê mỗi category Question được sử dụng trong bao nhiêu Question
 SELECT 
-    CategoryID, COUNT(QuestionID) AS NumberOfQuestions
+    COUNT(CategoryID) NumberOfUsed, CategoryID 
 FROM
     question
 GROUP BY CategoryID
-ORDER BY NumberOfQuestions;
+ORDER BY NumberOfUsed;
 
 -- Question 7: Thông kê mỗi Question được sử dụng trong bao nhiêu Exam
 SELECT 
@@ -94,11 +101,14 @@ GROUP BY DepartmentID;
 
 -- Question 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì, …
 SELECT 
-    question.*, answer.Content AS Answer, answer.QuestionID
+    question.*, answer.Content AS Answer, answer.QuestionID, `account`.FullName AS CreatorName
 FROM
     question
         LEFT JOIN
-    answer ON question.QuestionID = answer.QuestionID;
+    answer ON question.QuestionID = answer.QuestionID
+        LEFT JOIN
+    `account` ON `account`.AccountID = question.QuestionID;
+	
 
 -- Question 13: Lấy ra số lượng câu hỏi của mỗi loại tự luận hay trắc nghiệm
 SELECT 
@@ -157,7 +167,7 @@ FROM
     groupaccount
 WHERE
     GroupID = 1 
-UNION 
+UNION ALL
 SELECT 
     *
 FROM
