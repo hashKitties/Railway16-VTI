@@ -39,13 +39,13 @@ BEGIN
 	SELECT 
 		typequestion.TypeName,
 		COUNT(question.QuestionID) AS NumberOfQuestion,
-		question.CreateDate
+        question.CreateDate
 	FROM
 		question
         JOIN
 		typequestion ON typequestion.TypeID = question.TypeID
 	GROUP BY typequestion.TypeName
-	HAVING MONTH(CreateDate) = MONTH(NOW());
+	HAVING MONTH(question.CreateDate) = MONTH(NOW());
 END//
 DELIMITER ;
 CALL p_type_question_create_in_current_month();
@@ -53,38 +53,32 @@ CALL p_type_question_create_in_current_month();
 -- Question 4: Tạo store để trả ra id của type question có nhiều câu hỏi nhất
 DROP PROCEDURE IF EXISTS p_most_asked_type_question_id;
 DELIMITER //
-CREATE PROCEDURE p_most_asked_type_question_id()
+CREATE PROCEDURE p_most_asked_type_question_id(OUT v_resultid INT)
 BEGIN 
 	SELECT 
 		TypeID
-	FROM
+	INTO v_resultid FROM
 		question
 	GROUP BY TypeID
-	ORDER BY COUNT(QuestionID) DESC
-    LIMIT 1;
-END//
-DELIMITER ;
-CALL p_most_asked_type_question_id();
-
--- Function (not sovled)
-DROP FUNCTION IF EXISTS f_most_asked_type_question_id;
-DELIMITER //
-CREATE FUNCTION f_most_asked_type_question_id() RETURNS SMALLINT
-BEGIN 
-	DECLARE v_type_id SMALLINT;
-	SELECT 
-		TypeID
-	INTO v_type_id 
-    FROM
-		question
-	GROUP BY TypeID
-	ORDER BY COUNT(QuestionID) DESC;
-	RETURN v_type_id;
+	HAVING COUNT(QuestionID) = (SELECT MAX(mycount)
+								FROM
+									(SELECT 
+										COUNT(QuestionID) mycount
+									FROM
+										question
+									GROUP BY TypeID) AS maxcount);
 END//
 DELIMITER ;
 
--- Question 5: Sử dụng store ở question 4 để tìm ra tên của type question (not solved)
+CALL p_most_asked_type_question_id(@v_resultid);
 
+-- Question 5: Sử dụng store ở question 4 để tìm ra tên của type question 
+SELECT 
+    TypeName
+FROM
+    typequestion
+WHERE
+    TypeID = @v_resultid;
 
 -- Question 6: Viết 1 store cho phép người dùng nhập vào 1 chuỗi và trả về group có tên chứa chuỗi của người dùng nhập vào hoặc trả về user có username chứa chuỗi của người dùng nhập vào
 DROP PROCEDURE IF EXISTS p_show_input_group_or_username;
@@ -137,14 +131,14 @@ BEGIN
 	JOIN
 		typequestion ON typequestion.TypeID = question.TypeID
 	WHERE typequestion.TypeName = v_type_question
-	ORDER BY LENGTH(question.Content) DESC
-	LIMIT 1;
+	HAVING LENGTH(question.Content)  = MAX(LENGTH(question.Content));
+    
 END//
 DELIMITER ;
 
 CALL p_find_max_question_content('Essay');
 
--- Question 9: Viết 1 store cho phép người dùng xóa exam dựa vào ID (unsolved delete: Error code 1451)
+-- Question 9: Viết 1 store cho phép người dùng xóa exam dựa vào ID 
 -- PROCEDURE
 DROP PROCEDURE IF EXISTS p_delete_exam_id;
 DELIMITER //
@@ -157,34 +151,38 @@ DELIMITER ;
 
 CALL p_delete_exam_id(1);
 
--- Question 10: Tìm ra các exam được tạo từ 3 năm trước và xóa các exam đó đi (sử dụng store ở câu 9 để xóa) (unsolved)
+-- Question 10: Tìm ra các exam được tạo từ 3 năm trước và xóa các exam đó đi (sử dụng store ở câu 9 để xóa) 
+-- Sau đó in số lượng record đã remove từ các table liên quan trong khi removing
+CREATE TABLE IF NOT EXISTS deleted_exam LIKE exam;
+set autocommit = 0;
+Set foreign_key_checks = 0;
 DROP PROCEDURE IF EXISTS p_delete_exam_id_over_3_year;
 DELIMITER //
 CREATE PROCEDURE p_delete_exam_id_over_3_year()
 BEGIN
 	DECLARE v_target_exam_id SMALLINT;
-    delete_loop: LOOP
+    delete_loop: REPEAT
 		SELECT 
 			ExamID
 		INTO v_target_exam_id
 		FROM
 			exam
 		WHERE
-			YEAR(NOW()) - YEAR(CreateDate) >= 2
+			YEAR(NOW()) - YEAR(CreateDate) >= 3
 		LIMIT 1;
         IF v_target_exam_id IS NULL
 			THEN LEAVE delete_loop;
 		ELSE 
-			CALL p_delete_exam_id(v_target_exam_id);
+			INSERT INTO deleted_exam SELECT * FROM exam WHERE ExamID = v_target_exam_id;
+            CALL p_delete_exam_id(v_target_exam_id);
         END IF;
-    END LOOP delete_loop;
+	UNTIL v_target_exam_id IS NULL
+    END REPEAT delete_loop;
+    SELECT * FROM deleted_exam;
 END//
 DELIMITER ;
 
 CALL p_delete_exam_id_over_3_year();
-
--- Sau đó in số lượng record đã remove từ các table liên quan trong khi removing (unsolved)
-
 
 -- Question 11: Viết store cho phép người dùng xóa phòng ban bằng cách người dùng nhập vào tên phòng ban và các account thuộc phòng ban đó sẽ được
 -- chuyển về phòng ban default là phòng ban chờ việc
@@ -220,7 +218,7 @@ DELIMITER //
 CREATE PROCEDURE p_count_question_created_in_month()
 BEGIN 
 	SELECT 
-		COUNT(QuestionID)
+		COUNT(QuestionID) AS NumberOfQuestionCreatedInMonth
 	FROM
 		question
 	WHERE
@@ -232,20 +230,28 @@ DELIMITER ;
 CALL p_count_question_created_in_month();
 
 -- Question 13: Viết store để in ra mỗi tháng có bao nhiêu câu hỏi được tạo trong 6 tháng gần đây nhất
+-- (Nếu tháng nào không có thì sẽ in ra là "không có câu hỏi nào trong tháng")
 DROP PROCEDURE IF EXISTS p_count_question_created_in_6_month_range;
 DELIMITER //
 CREATE PROCEDURE p_count_question_created_in_6_month_range()
 BEGIN 
-	SELECT 
-		COUNT(QuestionID)
-	FROM
+	DECLARE v_counter SMALLINT;
+    SELECT 
+		COUNT(QuestionID) AS NumberOfQuestionCreated
+	INTO v_counter
+    FROM
 		question
 	WHERE
 		DATEDIFF(NOW(),CreateDate) <= 180
 	GROUP BY MONTH(CreateDate);
+    IF v_counter IS NULL
+    THEN 
+		SELECT 'không có câu hỏi nào trong tháng';
+    END IF;
 END//
 DELIMITER ;
 
 CALL p_count_question_created_in_6_month_range();
 
--- (Nếu tháng nào không có thì sẽ in ra là "không có câu hỏi nào trong tháng")
+
+

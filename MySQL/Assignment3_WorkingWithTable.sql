@@ -19,8 +19,11 @@ SELECT
     LENGTH(FullName) AS NameLength, FullName
 FROM
     `account`
-ORDER BY NameLength DESC
-LIMIT 1;
+WHERE
+    LENGTH(FullName) = (SELECT 
+            MAX(LENGTH(FullName))
+        FROM
+            `account`);
 
 -- Question 5: Lấy ra thông tin account có full name dài nhất và thuộc phòng ban có id = 3
 SELECT 
@@ -29,8 +32,12 @@ FROM
     account
 WHERE
     DepartmentID = 3
-ORDER BY NameLength DESC
-LIMIT 1;
+        && LENGTH(FullName) = (SELECT 
+            MAX(LENGTH(FullName))
+        FROM
+            `account`
+        WHERE
+            DepartmentID = 3);
 
 -- Question 6: Lấy ra tên group đã tham gia trước ngày 20/12/2019
 SELECT 
@@ -80,7 +87,7 @@ SELECT
 FROM
     `account`
 WHERE
-    FullName LIKE ('D%o');
+    SUBSTRING_INDEX(FullName, ' ', - 1) LIKE ('D%o');
 
 -- Question 12: Xóa tất cả các exam được tạo trước ngày 20/12/2019
 DELETE FROM exam 

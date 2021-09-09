@@ -120,25 +120,26 @@ DELIMITER ;
 
 CALL p_module_id_completed(NULL);
 
--- Question d: (unsolved)
-DROP FUNCTION IF EXISTS f_auto_work_employee;
+-- Question d: 
+DROP PROCEDURE IF EXISTS p_auto_work_employee;
 
 DELIMITER //
-CREATE FUNCTION f_auto_work_employee(v_module_id SMALLINT) 
-RETURNS SMALLINT
+CREATE PROCEDURE p_auto_work_employee(IN v_module_id SMALLINT) 
 BEGIN
-	DECLARE v_unassigned_id SMALLINT;
-    SELECT 
-		w.EmployeeID AS UnassignedID
-	INTO v_unassigned_id
-    FROM
-		project_module p
-	JOIN
-		work_done w ON w.ModuleID = p.ModuleID && p.EmployeeID <> w.EmployeeID
-	WHERE w.ModuleID = v_module_id;
-    RETURN v_unassigned_id;
+	 SELECT 
+		w.EmployeeID UnassginedID,
+		w.ModuleID,
+		e.EmployeeLastName,
+		e.EmployeeFirstName
+	FROM
+		work_done w
+	LEFT JOIN
+		project_module p USING (ModuleID)
+    JOIN employee e
+		ON e.EmployeeID = w.EmployeeID
+	WHERE p.EmployeeID <> w.EmployeeID && w.ModuleID = v_module_id;
 END//
 DELIMITER ;
 
-SELECT f_auto_work_employee(1);
+CALL p_auto_work_employee(3);
 

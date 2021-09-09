@@ -1,3 +1,4 @@
+USE testingsystem;
 -- Question 1: Tạo trigger không cho phép người dùng nhập vào Group có ngày tạo trước 1 năm trước
 DROP TRIGGER IF EXISTS tr_check_input;
 DELIMITER //
@@ -7,14 +8,13 @@ FOR EACH ROW
 	BEGIN
 		IF DATEDIFF(NOW(),NEW.CreateDate) > 365
         THEN
-			SIGNAL SQLSTATE '45000'
-				SET MESSAGE_TEXT = 'Khong duoc nhap ngay tao tu 1 nam truoc';
-		ELSE
-			INSERT INTO `group`
-            VALUES (NEW.GroupID,NEW.GroupName,NEW.CreatorID,NEW.CreateDate);
+			SIGNAL SQLSTATE '45000';
 		END IF;
 	END//
 DELIMITER ;
+
+INSERT INTO `Group`	(  GroupName			, CreatorID		, CreateDate)
+VALUES 				(N'Testing System 1'		,   5			,'2019-03-05');
 
 -- Question 2: Tạo trigger Không cho phép người dùng thêm bất kỳ user nào vào department "Sale" nữa, khi thêm thì hiện ra thông báo "Department
 -- "Sale" cannot add more user"
@@ -24,16 +24,16 @@ CREATE TRIGGER tr_stop_sale_input
 BEFORE INSERT ON `account`
 FOR EACH ROW
 	BEGIN
-		IF DepartmentID = 10
+		IF NEW.DepartmentID = 10
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = "Department \"Sale\" cannot add more user";
-		ELSE
-			INSERT INTO `account`
-            VALUES (NEW.Email,NEW.Usernam,NEW.Fullname,NEW.DepartmentID,NEW.PostionID,NEW.CreateDate);
 		END IF;
 	END//
 DELIMITER ;
+
+INSERT INTO `account`(Email								, Username			, FullName				, DepartmentID	, PositionID, CreateDate)
+VALUES 				('haida29productions@gmail.com'		,'dangack'			,'Nguyen Dang'			,   10			,   '1'		,'2020-03-05');
 
 -- Question 3: Cấu hình 1 group có nhiều nhất là 5 user
 DROP TRIGGER IF EXISTS tr_max_group_user;
@@ -44,7 +44,7 @@ FOR EACH ROW
 	BEGIN
 		DECLARE v_input_group_id SMALLINT;
         SELECT 
-			COUNT(AccountID)
+			COUNT(GroupID)
         INTO v_input_group_id
         FROM 
 			groupaccount
@@ -52,16 +52,15 @@ FOR EACH ROW
 			GroupID
         HAVING 
 			GroupID = NEW.GroupID; 
-        IF v_input_group_id > 5
+        IF v_input_group_id >= 5
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = "Cannot add more User on selected group";
-		ELSE
-			INSERT INTO groupaccount
-            VALUES (NEW.Email,NEW.Usernam,NEW.Fullname,NEW.DepartmentID,NEW.PostionID,NEW.CreateDate);
 		END IF;
 	END//
 DELIMITER ;
+INSERT INTO `GroupAccount`	(  GroupID	, AccountID	, JoinDate	 )
+VALUES 						(	2		,    1		,'2019-03-05');
 
 -- Question 4: Cấu hình 1 bài thi có nhiều nhất là 10 Question
 DROP TRIGGER IF EXISTS tr_max_question_exam;
@@ -72,21 +71,18 @@ FOR EACH ROW
 	BEGIN
 		DECLARE v_input_question_id SMALLINT;
         SELECT 
-			COUNT(ExamID)
+			COUNT(QuestionID)
         INTO v_input_question_id
         FROM 
 			examquestion
         GROUP BY 
-			QuestionID
+			ExamID
         HAVING 
-			QuestionID = NEW.QuestionID; 
-        IF v_input_question_id > 10
+			ExamID = NEW.ExamID; 
+        IF v_input_question_id >= 10
         THEN
 			SIGNAL SQLSTATE '45000'
-				SET MESSAGE_TEXT = "Cannot add more User on selected group";
-		ELSE
-			INSERT INTO examquestion
-            VALUES (NEW.ExamID,NEW.QuestionID);
+				SET MESSAGE_TEXT = "Cannot add more question on selected exam";
 		END IF;
 	END//
 DELIMITER ;
@@ -99,13 +95,10 @@ CREATE TRIGGER tr_admin_protect
 BEFORE DELETE ON `account`
 FOR EACH ROW
 	BEGIN
-		IF NEW.Email = 'admin@gmail.com'
+		IF OLD.Email = 'admin@gmail.com'
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = 'Cannot delete admin account';
-		ELSE
-			DELETE FROM `account`
-            WHERE Email = NEW.Email;
 		END IF;
 	END//
 DELIMITER ;
@@ -120,11 +113,7 @@ FOR EACH ROW
 	BEGIN
 		IF NEW.DepartmentID IS NULL
         THEN
-			INSERT INTO `account`
-            VALUES (NEW.Email,NEW.Usernam,NEW.Fullname,11,NEW.PostionID,NEW.CreateDate);
-		ELSE
-			INSERT INTO `account`
-            VALUES (NEW.Email,NEW.Usernam,NEW.Fullname,NEW.DepartmentID,NEW.PostionID,NEW.CreateDate);
+			SET NEW.DepartmentID = 11;
 		END IF;
 	END//
 DELIMITER ;
@@ -157,19 +146,30 @@ FOR EACH ROW
 		GROUP BY 
 			isCorrect;
             
-        IF v_number_of_answers >= 4 && v_number_of_isCorrect
+        IF v_number_of_answers >= 4 && v_number_of_isCorrect >= 2
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = "Cannot add more answer";
-		ELSE
-			INSERT INTO answer
-            VALUES (NEW.Answers,NEW.Content,NEW.QuestionID,NEW.isCorrect);
 		END IF;
 	END//
 DELIMITER ;
 
 -- Question 8: Viết trigger sửa lại dữ liệu cho đúng: (table not created)
 -- Nếu người dùng nhập vào gender của account là nam, nữ, chưa xác định thì sẽ đổi lại thành M, F, U cho giống với cấu hình ở database
+
+DROP TRIGGER IF EXISTS tr_correct_gender
+DELIMITER //
+CREATE TRIGGER tr_correct_gender 
+BEFORE INSERT ON `account`
+FOR EACH ROW
+	BEGIN
+		CASE NEW.Gender
+			WHEN 'Nam' THEN SET NEW.Gender = 'M';
+            WHEN 'Nữ' THEN SET NEW.Gender = 'F';
+            ELSE SET NEW.Gender = 'U';
+		END CASE;
+	END//
+DELIMITER ;
 
 -- Question 9: Viết trigger không cho phép người dùng xóa bài thi mới tạo được 2 ngày
 DROP TRIGGER IF EXISTS tr_exam_protect;
@@ -178,13 +178,10 @@ CREATE TRIGGER tr_exam_protect
 BEFORE DELETE ON exam
 FOR EACH ROW
 	BEGIN
-		IF DATEDIFF(NOW(), CreateDate) <= 2
+		IF DATEDIFF(NOW(), OLD.CreateDate) <= 2
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = 'Cannot delete exam created 2 days ago or less';
-		ELSE
-			DELETE FROM exam
-            WHERE ExamID = NEW.ExamID;
 		END IF;
 	END//
 DELIMITER ;
@@ -203,7 +200,7 @@ FOR EACH ROW
         INTO v_flag
         FROM 
 			QuestionID
-		WHERE NEW.QuestionID = QuestionID;
+		WHERE QuestionID = OLD.QuestionID;
         IF v_flag IS NULL 
         THEN
 			SIGNAL SQLSTATE '45000'
@@ -221,7 +218,7 @@ FOR EACH ROW
         INTO v_flag
         FROM 
 			QuestionID
-		WHERE NEW.QuestionID = QuestionID;
+		WHERE NEW.QuestionID = NEW.QuestionID;
         IF v_flag IS NULL 
         THEN
 			SIGNAL SQLSTATE '45000'

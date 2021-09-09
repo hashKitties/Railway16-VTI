@@ -1,7 +1,7 @@
 USE testingsystem;
 -- Question 1: Viết lệnh để lấy ra danh sách nhân viên và thông tin phòng ban của họ
 SELECT 
-    `account`.FullName,
+    `account`.*,
     department.DepartmentName
 FROM
     `account`
@@ -18,11 +18,14 @@ WHERE
 
 -- Question 3: Viết lệnh để lấy ra tất cả các developer
 SELECT 
-    *
+    `account`.*,
+    position.PositionName
 FROM
     `account`
+JOIN position
+USING (PositionID)
 WHERE
-    PositionID = 1;
+    PositionName = 'Dev';
 
 -- Question 4: Viết lệnh để lấy ra danh sách các phòng ban có > 3 nhân viên
 SELECT 
@@ -62,7 +65,7 @@ ORDER BY NumberOfUsed;
 
 -- Question 7: Thông kê mỗi Question được sử dụng trong bao nhiêu Exam
 SELECT 
-    COUNT(ExamID) AS NumberOfUsed, QuestionID
+    COUNT(QuestionID) AS NumberOfUsed, QuestionID
 FROM
     examquestion
 GROUP BY QuestionID;
@@ -73,8 +76,16 @@ SELECT
 FROM
     answer
 GROUP BY QuestionID
-ORDER BY NumberOfAnswers DESC
-LIMIT 1;
+HAVING
+    COUNT(Answers) = (
+		SELECT MAX(MyCount)
+		FROM
+			(SELECT 
+				COUNT(QuestionID) MyCount
+			FROM
+				answer
+			GROUP BY QuestionID) AS maxcount);
+
 
 -- Question 9: Thống kê số lượng account trong mỗi group
 SELECT 
@@ -89,15 +100,29 @@ SELECT
 FROM
     `account`
 GROUP BY PositionID
-ORDER BY COUNT(PositionID)
-LIMIT 2;
+HAVING
+    COUNT(PositionID) = (
+		SELECT MIN(MyCount)
+		FROM
+			(SELECT 
+				COUNT(PositionID) MyCount
+			FROM
+				`account`
+			GROUP BY PositionID) AS mincount);
 
 -- Question 11: Thống kê mỗi phòng ban có bao nhiêu dev, test, scrum master, PM
 SELECT 
-    COUNT(PositionID), PositionID, DepartmentID
+    d.DepartmentName,
+    p.PositionName,
+    COUNT(a.PositionID) AS NumberOfEmployee
 FROM
-    `account`
-GROUP BY DepartmentID;
+    `account` a
+        JOIN
+    department d USING (DepartmentID)
+        JOIN
+    position p USING (PositionID)
+GROUP BY DepartmentID, PositionID
+ORDER BY d.DepartmentName;
 
 -- Question 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì, …
 SELECT 
@@ -112,9 +137,11 @@ FROM
 
 -- Question 13: Lấy ra số lượng câu hỏi của mỗi loại tự luận hay trắc nghiệm
 SELECT 
-    COUNT(TypeID) AS NumberOfQuestion, TypeID
+    COUNT(q.TypeID) AS NumberOfQuestion, t.TypeName
 FROM
-    question
+    question q
+        JOIN
+    typequestion t USING (TypeID)
 GROUP BY TypeID;
 
 -- Question 14:Lấy ra group không có account nào 
