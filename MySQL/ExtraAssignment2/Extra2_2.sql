@@ -151,8 +151,8 @@ INSERT INTO donhang_giaohang VALUES
 ('DH0001',	'KH001',		'TV0001',		'DV001',		'KV001',		'Pham Van A',		'30 Hoang Van Thu',		'0905111111',		'TG004',		'2016-10-10',		'Tien Mat',			'Da phe duyet',			'Da giao hang'),
 ('DH0002',	'KH001',		'TV0002',		'DV001',		'KV005',		'Pham Van B',		'15 Le Dinh Ly',		'0905111112',		'TG005',		'2016-12-23',		'Tien Mat',			'Da phe duyet',			'Chua giao hang'),
 ('DH0003',	'KH002',		'TV0003',		'DV001',		'KV005',		'Pham Van C',		'23 Le Dinh Duong',		'0905111113',		'TG001',		'2017-04-08',		'Tien Mat',			'Da phe duyet',			'Da giao hang'),
-('DH0004',	'KH003',		'TV0001',		'DV003',		'KV002',		'Pham Van D',		'45 Pham Thu Thai',		'0905111115',		'TG002',		'2015-10-11',		'Chuyen Khoan',		'Da phe duyet',			'Da giao hang'),
-('DH0005',	'KH003',		'TV0005',		'DV003',		'KV003',		'Pham Van E',		'78 Hoang Dieu',		'0905111115',		'TG003',		'2017-04-04',		'Chuyen Khoan',		'Chua phe duyet',		NULL);
+('DH0004',	'KH003',		'TV0002',		'DV003',		'KV005',		'Pham Van D',		'45 Pham Thu Thai',		'0905111115',		'TG002',		'2015-10-11',		'Chuyen Khoan',		'Da phe duyet',			'Da giao hang'),
+('DH0005',	'KH002',		'TV0003',		'DV003',		'KV003',		'Pham Van E',		'78 Hoang Dieu',		'0905111115',		'TG003',		'2017-04-04',		'Chuyen Khoan',		'Chua phe duyet',		NULL);
 
 INSERT INTO dangkygiaohang VALUES 
 ('TV0001',	'TG004'),

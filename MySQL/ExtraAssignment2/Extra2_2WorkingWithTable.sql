@@ -1,4 +1,5 @@
 SET foreign_key_checks = 0;
+USE quanlygiaohang;
 -- Câu 1: Xóa những khách hàng có tên là “Le Thi A”.
 DELETE FROM khachhang 
 WHERE
@@ -96,16 +97,17 @@ FROM
 -- Câu 9: Liệt kê những thành viên giao hàng có giới tính là “Nu” và từng giao hàng cho 10
 -- khách hàng khác nhau ở khu vực giao hàng là “Hai Chau”
 SELECT 
-    tv.*
+    tv.*, COUNT(DISTINCT dh.MaKhachHang) SoKhachHangKhacNhau
 FROM
     thanhviengiaohang tv
         JOIN
     donhang_giaohang dh
+    USING (MaThanhVienGiaoHang)
 WHERE
     dh.MaKhuVucGiaoHang = 'KV004'
-        AND tv.GioiTinh = 'F';
-
-
+        AND tv.GioiTinh = 'F'
+GROUP BY MaThanhVienGiaoHang
+HAVING COUNT(DISTINCT MaKhachHang) >= 10;
 
 -- Câu 10: Liệt kê những khách hàng đã từng yêu cầu giao hàng tại khu vực “Lien Chieu” và
 -- chưa từng được một thành viên giao hàng nào có giới tính là “Nam” nhận giao hàng
