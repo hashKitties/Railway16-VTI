@@ -1,0 +1,90 @@
+Question 11:
+hoan vi khong lap: n!
+int giaithua = 1
+if n = 0
+then giaithua = 1
+else 
+	for (i = 1 ; i<= n; i++)
+		giaithua *= i;
+
+
+Question 12:
+Hop: x trong A hoac B, bo so lap
+ArrayList mylist
+a[]
+b[]
+int i = 0;
+int j = 0;
+int n;
+if a.length < b.length
+   do {
+	if a[i] = b[j] => add a[i]
+	if a[i] < b[j] => add a[i], b[j]
+	if a[j] > b[j] => add b[j], a[i]
+	i++;
+	j++;
+   } while (i < a.length)
+   while (j<b.length) {
+	j ++
+	add b[j]   
+   } 
+else 
+   do {
+	if a[i] = b[j] => add a[i]
+	if a[i] < b[j] => add a[i], b[j]
+	if a[j] > b[j] => add b[j], a[i]
+	i++;
+	j++;
+   } while (j < b.length)
+   while (i<a.length) {
+	i ++
+	add a[i]   
+   } 
+
+// Dung hashset
+HashSet myset
+myset.add[a]
+myset.add[b]
+myset.sort
+
+Question 13:
+isNotIn (int a[], n)
+flag = true
+	for (i = 0; i<a.length; i++)
+		if a[i] = n => flag = false; 
+		break;
+return flag
+
+a[]
+temp[].length = a.length
+min = a[0]
+j = 0;
+do {
+	for (i = 0; i < a.length; i++)
+		if a[i] < min && inNotIn(temp, i) => min = a[i]
+	for (i = 0; i < a.length; i++)
+		if a[i] = min => temp[j] = i;
+	j++;
+
+} while (j < a.length)
+for (i : temp)
+	print a[i]
+
+Question 14:
+isFibonanci (int n)
+if n = 1 => true
+else	
+ 	f1 = 1
+	f2 = 1
+   do
+	f = f1 + f2
+	f1 = f2
+	f2 = f
+   while (n > f)
+	if f2 = n => fibonaci
+	else not fibonaci 
+
+for i = 1 to i < n 
+if isFibonanci(i) and isNT(i) => print i
+
+
