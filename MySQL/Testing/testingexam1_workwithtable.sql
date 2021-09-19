@@ -13,30 +13,42 @@ ORDER BY BoughtAmount;
 
 -- 3.Viết hàm (không có parameter) trả về tên hãng sản xuất đã bán được nhiều
 -- oto nhất trong năm nay.
-DROP PROCEDURE IF EXISTS p_best_seller;
+DROP FUNCTION IF EXISTS f_best_seller;
 DELIMITER //
+SET GLOBAL log_bin_trust_function_creators = 1;
 
-CREATE PROCEDURE p_best_seller()
+CREATE FUNCTION f_best_seller() 
+RETURNS VARCHAR(20)
 BEGIN
-	SELECT 
+	DECLARE v_seller VARCHAR(20);
+    SELECT 
 		ca.Maker
+	INTO v_seller
 	FROM
 		CAR ca
-			JOIN
+        JOIN
 		CAR_ORDER co USING (CarID)
-	GROUP BY co.CarID
+	WHERE
+		YEAR(co.DeliveryDate) = 2000
+			AND co.Staus = '0'
+	GROUP BY ca.Maker
 	HAVING SUM(co.Amount) = (SELECT 
 								MAX(mysum)
 							FROM
 								(SELECT 
 									SUM(Amount) mysum
 								FROM
-									CAR_ORDER
-								GROUP BY CarID) AS maxcount);
+									CAR ca
+										JOIN CAR_ORDER co USING (CarID)
+								WHERE
+									YEAR(co.DeliveryDate) = 2000
+										AND co.Staus = '0'
+								GROUP BY ca.Maker) AS maxcount);
+	RETURN v_seller;
 END//
 DELIMITER ;
 
-CALL p_best_seller;
+Select f_best_seller();
 -- 4.Viết 1 thủ tục (không có parameter) để xóa các đơn hàng đã bị hủy của
 -- những năm trước. In ra số lượng bản ghi đã bị xóa.
 DROP PROCEDURE IF EXISTS p_delete_canceled_order_year_ago;

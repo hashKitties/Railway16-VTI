@@ -146,7 +146,7 @@ FOR EACH ROW
 		GROUP BY 
 			isCorrect;
             
-        IF v_number_of_answers >= 4 && v_number_of_isCorrect >= 2
+        IF v_number_of_answers >= 4 && v_number_of_isCorrect  >= 2 && NEW.isCorrect = 1
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = "Cannot add more answer";
@@ -201,7 +201,7 @@ FOR EACH ROW
         FROM 
 			QuestionID
 		WHERE QuestionID = OLD.QuestionID;
-        IF v_flag IS NULL 
+        IF v_flag IS NOT NULL 
         THEN
 			SIGNAL SQLSTATE '45000'
 				SET MESSAGE_TEXT = 'Cannot delate question not in any exam';
