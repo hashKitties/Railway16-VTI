@@ -157,7 +157,7 @@ public class Excercise1 {
     // Hãy sắp xếp các dãy này theo chiều tăng dần, giảm dần
     // Yêu cầu:
     // Thiết kế giao diện console nhập từng phần tử và hiển thị kết quả ra màn hình.
-    public static void nhapSo(Scanner scan) {
+    public static int[] nhapSo(Scanner scan) {
         int a[] = new int[10];
         for (int i = 0; i < a.length; i++) {
             System.out.print("a[" + i + "] = ");
@@ -167,12 +167,23 @@ public class Excercise1 {
         for (int i : a) {
             System.out.print(i + "\t");
         }
+        return a;
     }
     // Sau khi nhập đủ 10 phần tử theo đúng thứ tự như đề bài thì thực hiện sắp xếp
     // theo chiều tăng dần, giảm dần
 
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        
+        int a[]= nhapSo(scan);
+        a = sortDESC(a);
+        System.out.println("\nMang theo thu tu giam dan: ");
+        for (int i: a) {
+            System.out.print(i + "\t");
+        } 
+        a = sortASC(a);
+        System.out.println("\nMang theo thu tu tang dan: ");
+        for (int i: a) {
+            System.out.print(i + "\t");
+        }
     }
 }
