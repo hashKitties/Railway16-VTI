@@ -497,7 +497,7 @@ public class excercise2 {
     // nhap so nguyen x va chen so vao mang sao cho van giam dan
     // Giong bai 18
 
-    
+
     // Question 20: chuan hoa xau ky tu: bo dau cach thua, viet hoa chu cai dau cau,
     // cac ky tu khac thanh ky tu thuong
     public static void chuanHoaString(String a) {
